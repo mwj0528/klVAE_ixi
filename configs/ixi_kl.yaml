@@ -1,0 +1,60 @@
+model:
+  base_learning_rate: 4.5e-6
+  target: taming.models.vqgan.AutoencoderKL
+  params:
+    modalities: ['t1', 't2', 'pd']
+    # ignore_keys: ["loss.discriminator.main.0.weight"]
+    ckpt_path: null
+    # stage kept for config compatibility; AutoencoderKL is stage-1 only (no SPADE)
+    stage: 1
+    embed_dim: 3
+    # n_embed: 8192
+    ddconfig:
+      double_z: True
+      z_channels: 3
+      resolution: 128
+      in_channels: 1
+      out_ch: 1
+      ch: 128
+      ch_mult: [1,2,4]
+      num_res_blocks: 2
+      attn_resolutions: []
+      dropout: 0.0
+      use_checkpoint: 1  # checkpoint only the highest-res level (True = all levels)
+
+    lossconfig:
+      target: taming.modules.losses.contperceptual.LPIPSWithDiscriminator
+      params:
+        disc_conditional: False
+        disc_in_channels: 1
+        # disc_start: 20001
+        disc_start: 50001
+        kl_weight: 0.00001
+        disc_weight: 0.5
+        disc_factor: 0
+        perceptual_weight: 0.0
+
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 1
+    num_workers: 8
+    data_path: /scratch2/mailab_yonsei/MW/lustre/MRI/IXI/3D/IXI_datalist_3D.json
+    train:
+      target: taming.data.custom.IXITrain
+    validation:
+      target: taming.data.custom.IXIVal
+    test:
+      target: taming.data.custom.IXITest
+
+lightning:
+  trainstep_checkpoint:
+    params:
+      every_n_train_steps: 50000
+  callbacks:
+    image_logger:
+      target: main.ImageLogger
+      params:
+        batch_frequency: 500
+        max_images: 4
+        clamp: True

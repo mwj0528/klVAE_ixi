@@ -1,0 +1,46 @@
+model:
+  base_learning_rate: 1e-5
+  target: taming.models.vqgan.VQModel
+  params:
+    num_classes: 4
+    ckpt_path: null
+    stage: 1
+    embed_dim: 4
+    n_embed: 8192
+    ddconfig:
+      double_z: False
+      z_channels: 4
+      resolution: 128
+      in_channels: 1
+      out_ch: 1
+      ch: 64
+      ch_mult:
+      - 1
+      - 1
+      - 2
+      num_res_blocks: 2
+      attn_resolutions: [8]
+      dropout: 0.0
+
+    lossconfig:
+      target: taming.modules.losses.vqperceptual.VQLPIPSWithDiscriminator
+      params:
+        disc_conditional: False
+        disc_in_channels: 1
+        disc_start: 0
+        disc_weight: 0.8
+        disc_factor: 0
+        codebook_weight: 1.0
+        num_classes: 1
+
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 4
+    data_path: /scratch2/mailab_yonsei/MW/lustre/MRI/BraTS2021/3D/BraTS2021_datalist_3D.json
+    train:
+      target: taming.data.custom.BraTSTrain
+    validation:
+      target: taming.data.custom.BraTSVal
+    test:
+      target: taming.data.custom.BraTSTest

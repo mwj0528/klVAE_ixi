@@ -1,0 +1,14 @@
+logs/
+wandb/
+__pycache__/
+*.py[cod]
+*.egg-info/
+slurm-*.out
+*.ckpt
+*.pt
+*.pth
+*.nii
+*.nii.gz
+.env
+.env.*
+!.env.example
