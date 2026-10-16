@@ -11,9 +11,7 @@ from taming.modules.diffusionmodules.model import Encoder, Decoder
 from taming.modules.vqvae.quantize import VectorQuantizer2 as VectorQuantizer
 from taming.modules.vqvae.quantize import GumbelQuantize
 from taming.modules.vqvae.quantize import EMAVectorQuantizer
-import sys
-sys.path.append("/scratch2/mailab_yonsei/MW/CY/ALDM/LDM")
-from ldm.modules.distributions.distributions import DiagonalGaussianDistribution
+from taming.modules.distributions import DiagonalGaussianDistribution
 
 class VQModel(pl.LightningModule):
     def __init__(self,
